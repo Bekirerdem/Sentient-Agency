@@ -14,7 +14,7 @@ const Manifesto = () => {
   const xRight = useTransform(scrollYProgress, [0, 1], ["10%", "-20%"]);
 
   return (
-    <section ref={containerRef} className="relative w-full py-40 bg-[#050505] overflow-hidden flex flex-col justify-center gap-10">
+    <section ref={containerRef} className="relative w-full py-40 bg-[#050505] overflow-hidden flex flex-col justify-center gap-10" style={{ position: "relative" }}>
       
       {/* Arka Plan Gürültüsü */}
       <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: `url("https://grainy-gradients.vercel.app/noise.svg")` }} />

@@ -1,81 +1,83 @@
 import { motion } from "framer-motion";
 
-const socialLinks = [
-  { name: "LinkedIn", url: "https://www.linkedin.com/in/bekir-erdem/" },
-  { name: "Instagram", url: "https://www.instagram.com/l3ekirerdem/" },
-  { name: "Twitter / X", url: "https://x.com/l3ekirerdem" },
-  { name: "GitHub", url: "#" } // GitHub varsa ekleyebiliriz
-];
-
-const sitemap = [
-  { name: "Manifesto", href: "#manifesto" },
-  { name: "Services", href: "#services" },
-  { name: "Process", href: "#process" },
-  { name: "Works", href: "#works" }
-];
-
 const Footer = () => {
   return (
-    <footer className="relative w-full px-4 pt-40 pb-10 bg-black border-t border-white/10 overflow-hidden">
+    <footer className="relative w-full bg-black border-t border-[#CCFF00]/20 pt-32 pb-10 overflow-hidden">
       
-      {/* Arka Plan Deseni */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none" 
-           style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #333 1px, transparent 0)' , backgroundSize: '40px 40px' }} 
-      />
+      {/* Grid Arka Plan */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20 pointer-events-none" />
 
-      <div className="relative z-10 flex flex-col justify-between max-w-[90rem] mx-auto min-h-[50vh]">
+      <div className="container px-6 mx-auto relative z-10">
         
-        {/* DEVASA BAŞLIK (CTA) */}
-        <div className="flex flex-col gap-8">
-            <h2 className="text-[12vw] font-black text-white uppercase font-clash leading-[0.8] tracking-tighter">
-              READY TO <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#CCFF00] to-emerald-600">COLLABORATE?</span>
-            </h2>
+        {/* ÜST KISIM: DEVASA CTA */}
+        <div className="flex flex-col md:flex-row justify-between items-end mb-32 border-b border-white/10 pb-20">
+           <div>
+              <p className="text-[#CCFF00] font-mono mb-4 tracking-widest">// NEXT STEP</p>
+              <h2 className="text-[10vw] font-black text-white uppercase font-clash leading-[0.8]">
+                ACTIVATE <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#CCFF00] to-white">FUTURE.</span>
+              </h2>
+           </div>
+           
+           <button className="mt-10 md:mt-0 px-12 py-6 bg-[#CCFF00] text-black text-xl font-black uppercase tracking-widest hover:bg-white hover:scale-105 transition-all clip-path-slant">
+              Start Project_
+           </button>
         </div>
 
-        {/* LİNKLER & BİLGİ */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mt-32 pt-10 border-t border-white/10">
+        {/* ORTA KISIM: DETAYLAR */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             
-            {/* SITEMAP */}
+            {/* Kolon 1: Marka */}
             <div className="space-y-6">
-                <h4 className="text-[10px] font-bold text-[#CCFF00] uppercase tracking-[0.2em]">[ SITEMAP ]</h4>
-                <ul className="space-y-2 text-sm text-gray-400 font-mono">
-                    {sitemap.map((item) => (
-                      <li key={item.name}>
-                        <a href={item.href} className="hover:text-white transition-colors">./ {item.name}</a>
-                      </li>
-                    ))}
-                </ul>
+               <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-[#CCFF00]" />
+                  <span className="text-xl font-bold text-white font-clash tracking-tight">SENTIENT_AI</span>
+               </div>
+               <p className="text-gray-500 text-sm font-mono leading-relaxed">
+                  Building the neural architecture of the next web. 
+                  Automation, Intelligence, Dominance.
+               </p>
             </div>
 
-            {/* SOCIALS (GERÇEK LİNKLER) */}
-            <div className="space-y-6">
-                <h4 className="text-[10px] font-bold text-[#CCFF00] uppercase tracking-[0.2em]">[ SOCIALS ]</h4>
-                <ul className="space-y-2 text-sm text-gray-400 font-mono">
-                    {socialLinks.map((item) => (
-                        <li key={item.name}>
-                          <a 
-                            href={item.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="hover:text-white transition-colors group flex items-center gap-2"
-                          >
-                            <span>./ {item.name}</span>
-                            <span className="opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
-                          </a>
-                        </li>
-                    ))}
-                </ul>
+            {/* Kolon 2: Sitemap */}
+            <div>
+               <h4 className="text-white font-bold mb-6 uppercase tracking-widest text-xs border-l-2 border-[#CCFF00] pl-2">Navigation</h4>
+               <ul className="space-y-3 text-sm text-gray-400 font-mono">
+                  {['Manifesto', 'Services', 'Process', 'Works'].map(item => (
+                    <li key={item} className="hover:text-[#CCFF00] cursor-pointer transition-colors">./ {item}</li>
+                  ))}
+               </ul>
             </div>
-            
-            {/* MARKA İMZASI */}
-            <div className="col-span-2 text-right flex flex-col justify-end">
-                <div className="text-3xl font-black text-white font-clash uppercase">SENTIENT_AI</div>
-                <div className="text-[10px] text-gray-500 font-mono mt-2">
-                   © 2025 // BEKIR ERDEM. ALL RIGHTS RESERVED.
-                </div>
+
+            {/* Kolon 3: Socials */}
+            <div>
+               <h4 className="text-white font-bold mb-6 uppercase tracking-widest text-xs border-l-2 border-[#CCFF00] pl-2">Connect</h4>
+               <ul className="space-y-3 text-sm text-gray-400 font-mono">
+                  <li><a href="https://www.linkedin.com/in/bekir-erdem/" className="hover:text-[#CCFF00]">LinkedIn ↗</a></li>
+                  <li><a href="https://www.instagram.com/l3ekirerdem/" className="hover:text-[#CCFF00]">Instagram ↗</a></li>
+                  <li><a href="https://x.com/l3ekirerdem" className="hover:text-[#CCFF00]">Twitter / X ↗</a></li>
+               </ul>
+            </div>
+
+            {/* Kolon 4: Status */}
+            <div className="bg-[#111] p-6 border border-white/5 rounded-sm">
+               <div className="flex items-center gap-3 mb-4">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-xs text-green-500 font-mono uppercase">Systems Operational</span>
+               </div>
+               <div className="text-[10px] text-gray-600 font-mono space-y-1">
+                  <p>CPU: 12% / MEM: 4GB</p>
+                  <p>LOC: BURSA, TR</p>
+                  <p>TIME: {new Date().toLocaleTimeString()}</p>
+               </div>
             </div>
         </div>
+
+        {/* ALT KISIM: COPYRIGHT */}
+        <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-600 font-mono uppercase tracking-widest">
+           <p>© 2025 SENTIENT SYSTEMS. ALL RIGHTS RESERVED.</p>
+           <p>DESIGNED BY BEKIR ERDEM</p>
+        </div>
+
       </div>
     </footer>
   );

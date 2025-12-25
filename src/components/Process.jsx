@@ -38,7 +38,7 @@ const Process = () => {
   const x = useTransform(scrollYProgress, [0, 1], ["0%", "-75%"]);
 
   return (
-    <section ref={targetRef} id="process" className="relative h-[300vh] bg-[#080808]">
+    <section ref={targetRef} id="process" className="relative h-[300vh] bg-[#080808]" style={{ position: "relative" }}>
       <div className="sticky top-0 flex items-center h-screen overflow-hidden border-t border-white/5">
         
         {/* Sol Sabit Başlık */}

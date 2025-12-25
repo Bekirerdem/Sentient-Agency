@@ -13,7 +13,7 @@ const Showreel = () => {
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
   return (
-    <section ref={containerRef} className="relative w-full h-[100vh] flex items-center justify-center bg-black overflow-hidden py-20">
+    <section ref={containerRef} className="relative w-full h-[100vh] flex items-center justify-center bg-black overflow-hidden py-20" style={{ position: "relative" }}>
       
       {/* Video Container */}
       <motion.div 
@@ -28,7 +28,6 @@ const Showreel = () => {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="https://cdn.pixabay.com/video/2019/04/20/22908-331623069_large.mp4" type="video/mp4" />
         </video>
 
         {/* Overlay */}
