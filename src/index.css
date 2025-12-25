@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-deep-black: #050505;
+  --color-neon-green: #CCFF00;
+  --color-electric-purple: #8F00FF;
+  
+  --font-clash: 'Clash Display', sans-serif;
+  --font-manrope: 'Manrope', sans-serif;
+}
+
+/* Custom Animation Utilities */
+@keyframes pan-grid {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+.animate-pan-grid {
+  animation: pan-grid 20s linear infinite;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-deep-black);
+    color: white;
+    font-family: 'Manrope', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    cursor: none;
+  }
+  
+  ::selection {
+    background-color: var(--color-neon-green);
+    color: var(--color-deep-black);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-clash);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background-color: var(--color-deep-black);
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-neon-green);
+    border-radius: 9999px;
+  }
+}
