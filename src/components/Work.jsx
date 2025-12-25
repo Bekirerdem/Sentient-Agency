@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useCursor } from "../context/CursorContext"; // EKLENDİ
 
@@ -77,26 +77,44 @@ const ProjectCard = ({ project, index, setCursorVariant }) => {
 
 const Work = () => {
   const targetRef = useRef(null);
-  const { setCursorVariant } = useCursor(); // CONTEXT BAĞLANTISI
+  const { setCursorVariant } = useCursor(); 
   
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: targetRef,
   });
 
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-85%"]);
+  const xRange = useTransform(scrollYProgress, [0, 1], ["0%", "-85%"]);
+  const x = isMobile ? 0 : xRange;
 
   return (
-    <section ref={targetRef} id="works" className="relative h-[300vh] bg-black" style={{ position: "relative" }}>
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-        <motion.div style={{ x }} className="flex gap-8 md:gap-16 pl-6 md:pl-24 items-center">
+    <section 
+      ref={targetRef} 
+      id="works" 
+      className="relative bg-black h-auto md:h-[300vh]" 
+      style={{ position: "relative" }}
+    >
+      <div className="relative md:sticky top-0 flex flex-col md:flex-row h-auto md:h-screen items-start md:items-center overflow-visible md:overflow-hidden py-20 md:py-0">
+        <motion.div 
+          style={{ x }} 
+          className="flex flex-col md:flex-row gap-20 md:gap-16 px-6 md:pl-24 items-center w-full md:w-auto"
+        >
           
           {/* GİRİŞ BLOĞU */}
           <div 
-            className="w-[80vw] md:w-[30vw] shrink-0 flex flex-col justify-center"
-            onMouseEnter={() => setCursorVariant("text")} // GİRİŞTE TEXT CURSOR
+            className="w-full md:w-[30vw] shrink-0 flex flex-col justify-center text-center md:text-left"
+            onMouseEnter={() => setCursorVariant("text")} 
             onMouseLeave={() => setCursorVariant("default")}
           >
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
               <div className="w-3 h-3 bg-[#CCFF00] animate-pulse" />
               <h2 className="text-sm font-bold text-[#CCFF00] font-mono uppercase tracking-widest">
                 Selected Ecosystems
@@ -108,7 +126,7 @@ const Work = () => {
                 Reality
               </span>
             </h2>
-            <p className="mt-8 text-gray-400 font-mono text-sm max-w-sm">
+            <p className="mt-8 text-gray-400 font-mono text-sm max-w-sm mx-auto md:mx-0">
               [SCROLL DOWN TO EXPLORE]<br/>
               Biz web sitesi yapmıyoruz. Dijital varlıklar inşa ediyoruz.
             </p>
@@ -116,18 +134,19 @@ const Work = () => {
 
           {/* PROJELER */}
           {projects.map((project, i) => (
-            <ProjectCard 
-              key={i} 
-              project={project} 
-              index={i} 
-              setCursorVariant={setCursorVariant} 
-            />
+            <div key={i} className="w-full md:w-auto flex justify-center">
+                <ProjectCard 
+                project={project} 
+                index={i} 
+                setCursorVariant={setCursorVariant} 
+                />
+            </div>
           ))}
 
-          {/* ARŞİV KARTI (WORKFORCE) -> DIAMOND TETİKLEYİCİ */}
+          {/* ARŞİV KARTI */}
           <div 
-            className="w-[80vw] md:w-[25vw] h-[60vh] md:h-[70vh] shrink-0 flex items-center justify-center border border-white/10 bg-white/5 hover:bg-[#CCFF00] hover:text-black transition-colors group cursor-pointer rounded-lg"
-            onMouseEnter={() => setCursorVariant("diamond")} // İŞTE BU KOD EKSİKTİ
+            className="w-full md:w-[25vw] h-[40vh] md:h-[70vh] shrink-0 flex items-center justify-center border border-white/10 bg-white/5 hover:bg-[#CCFF00] hover:text-black transition-colors group cursor-pointer rounded-lg"
+            onMouseEnter={() => setCursorVariant("diamond")} 
             onMouseLeave={() => setCursorVariant("default")}
           >
               <div className="text-center">
