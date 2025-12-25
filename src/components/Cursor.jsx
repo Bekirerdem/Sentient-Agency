@@ -79,7 +79,7 @@ const Cursor = () => {
 
   return (
     <motion.div
-      className="fixed top-0 left-0 z-[9999] pointer-events-none flex items-center justify-center"
+      className="hidden md:flex fixed top-0 left-0 z-[9999] pointer-events-none items-center justify-center"
       variants={variants}
       animate={cursorVariant}
       transition={{
