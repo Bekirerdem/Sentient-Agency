@@ -14,7 +14,7 @@ const Manifesto = () => {
   const xRight = useTransform(scrollYProgress, [0, 1], ["10%", "-20%"]);
 
   return (
-    <section ref={containerRef} className="relative w-full py-40 bg-[#050505] overflow-hidden flex flex-col justify-center gap-10" style={{ position: "relative" }}>
+    <section id="manifesto" ref={containerRef} className="relative w-full py-40 bg-[#050505] overflow-hidden flex flex-col justify-center gap-10" style={{ position: "relative" }}>
       
       {/* Arka Plan Gürültüsü */}
       <div className="absolute inset-0 opacity-[0.05] pointer-events-none" style={{ backgroundImage: `url("https://grainy-gradients.vercel.app/noise.svg")` }} />
@@ -23,10 +23,15 @@ const Manifesto = () => {
          <p className="text-[#CCFF00] font-mono text-xs tracking-[0.5em] mb-4 uppercase">
             // The Problem
          </p>
-         <h2 className="text-3xl md:text-5xl font-medium text-white font-clash leading-tight max-w-4xl mx-auto">
+         <h2 className="text-3xl md:text-5xl font-medium text-white font-clash leading-tight max-w-4xl mx-auto mb-8">
            Manuel iş gücü, modern çağın <span className="text-gray-500 line-through decoration-[#CCFF00]">köleliğidir.</span> <br/>
            Biz, kaosunuzu <span className="text-[#CCFF00] border-b border-[#CCFF00]">verimliliğe</span> dönüştürüyoruz.
          </h2>
+         <p className="max-w-2xl mx-auto text-gray-400 font-manrope text-sm md:text-base leading-relaxed">
+            Eski dünya, yavaş ve hataya açık süreçlerle can çekişiyor. 
+            Biz, işletmenizin DNA'sına otonom yapay zeka ajanlarını entegre ederek verimsizliği yok ediyoruz. 
+            Gelecek beklemez; ya adapte olursunuz ya da yok olursunuz.
+         </p>
       </div>
 
       {/* Kinetik Tipografi (Kayan Devasa Yazılar) */}
