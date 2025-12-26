@@ -24,32 +24,52 @@ const Navbar = () => {
         transition={{ duration: 1, delay: 0.5 }}
         className="fixed top-0 left-0 z-[100] flex items-center justify-between w-full px-6 py-4 mix-blend-difference text-white bg-black/10 backdrop-blur-sm border-b border-white/5"
       >
-        <div className="flex items-center gap-3 select-none cursor-pointer group">
+        <motion.div 
+            className="flex items-center gap-3 select-none cursor-pointer group"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
           <div className="relative w-10 h-10 border border-[#CCFF00]/30 flex items-center justify-center overflow-hidden bg-black">
              <div className="w-full h-full bg-[#CCFF00] absolute translate-y-full group-hover:translate-y-0 transition-transform duration-300"/>
              <div className="w-2 h-2 bg-[#CCFF00] rotate-45 z-10 group-hover:bg-black transition-colors" />
           </div>
           
-          <div className="flex flex-col leading-none">
-             <span className="text-xl font-black tracking-tighter uppercase font-clash">
-               <span className="text-white font-bold">SENT</span>
-               <span className="text-[#CCFF00] italic font-mono">IENT</span>
+          <div className="flex flex-col">
+             <span className="text-2xl font-black tracking-tighter uppercase font-clash text-white leading-none">
+               SENT<span className="text-[#CCFF00] font-serif px-px">I</span>ENT
+             </span>
+             <span className="text-[0.6rem] font-medium tracking-[0.3em] text-[#CCFF00] font-manrope leading-none opacity-80 group-hover:opacity-100 transition-opacity">
+               AGENCY
              </span>
           </div>
-        </div>
+        </motion.div>
 
         {/* DESKTOP MENU */}
         <div className="hidden md:flex items-center gap-1 p-1 bg-black/50 backdrop-blur-md rounded-sm border border-white/10">
           {navLinks.map((item) => (
-            <a key={item} href={`#${item.toLowerCase()}`} className="px-6 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-[#CCFF00] hover:text-black transition-all">
+            <motion.a 
+                key={item} 
+                href={`#${item.toLowerCase()}`} 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-white hover:text-[#CCFF00] transition-colors overflow-hidden"
+            >
               {item}
-            </a>
+              <div className="absolute inset-0 bg-[#CCFF00]/10 opacity-0 hover:opacity-100 transition-opacity -z-10" />
+            </motion.a>
           ))}
         </div>
 
-        <button className="hidden md:block px-6 py-3 text-[10px] font-black text-[#CCFF00] border border-[#CCFF00] bg-transparent hover:bg-[#CCFF00] hover:text-black transition-all duration-300 tracking-widest uppercase">
-          BOOK DEMO
-        </button>
+        <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
+            className="hidden md:block group"
+        >
+            <div className="px-6 py-3 text-[10px] font-black text-[#CCFF00] border border-[#CCFF00] bg-transparent transition-all duration-300 tracking-widest uppercase group-hover:bg-[#CCFF00] group-hover:text-black">
+                BOOK DEMO
+            </div>
+        </motion.button>
 
         {/* MOBILE HAMBURGER BUTTON */}
         <div 
