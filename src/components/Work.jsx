@@ -24,7 +24,7 @@ const ProjectCard = ({ project, index, setCursorVariant }) => {
       target="_blank"
       rel="noopener noreferrer"
       ref={containerRef}
-      className="relative w-[85vw] md:w-[60vw] h-[60vh] md:h-[70vh] shrink-0 group block border border-white/10 hover:border-[#CCFF00] transition-all duration-500 rounded-lg overflow-hidden bg-[#050505]"
+      className="relative w-[85vw] md:w-[60vw] h-[300px] md:h-[70vh] shrink-0 group block border border-white/10 hover:border-[#CCFF00] transition-all duration-500 rounded-lg overflow-hidden bg-[#050505]"
       onMouseEnter={() => setCursorVariant(CURSOR_TYPES[index % CURSOR_TYPES.length])}
       onMouseLeave={() => setCursorVariant("default")}
     >
@@ -35,10 +35,10 @@ const ProjectCard = ({ project, index, setCursorVariant }) => {
             muted 
             loop 
             playsInline
-            preload="none"
-            className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 grayscale group-hover:grayscale-0"
+            preload="metadata"
+            className="absolute inset-0 w-full h-full object-cover opacity-100 grayscale-0 md:opacity-50 md:grayscale md:group-hover:opacity-100 md:group-hover:grayscale-0 md:group-hover:scale-105 transition-all duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90 group-hover:opacity-30 transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-30 md:opacity-90 md:group-hover:opacity-30 transition-opacity duration-500" />
 
           <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full z-20 flex flex-col justify-end h-full">
              <div className="flex items-center gap-4 mb-4">

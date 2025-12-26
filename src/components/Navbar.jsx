@@ -99,7 +99,7 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: "-100%" }}
             transition={{ duration: 0.5, ease: "circOut" }}
-            className="fixed inset-0 z-[90] bg-blackflex flex-col items-center justify-center bg-[#050505]"
+            className="fixed inset-0 z-[90] bg-black flex flex-col items-center justify-center bg-[#050505]"
           >
              {/* Arka plan efekti */}
              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-green-900/20 via-black to-black opacity-50 pointer-events-none" />

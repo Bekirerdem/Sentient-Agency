@@ -3,6 +3,14 @@ import { motion } from "framer-motion";
 
 const AgencyVision = () => {
   const [activeIndex, setActiveIndex] = React.useState(0);
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize(); // Check on mount
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const cards = [
     {
@@ -49,9 +57,8 @@ const AgencyVision = () => {
     let offset = (index - activeIndex) % total;
     if (offset < 0) offset += total;
     
-    // offset 0 = Active (Center)
-    // offset 1 = Next (Right Back)
-    // offset 2 = Prev (Left Back)
+    // Responsive offset
+    const xOffset = isMobile ? 40 : 240;
 
     if (offset === 0) {
         return { 
@@ -65,17 +72,17 @@ const AgencyVision = () => {
     } else if (offset === 1) {
         // Right Side
         return { 
-            x: 240, // Significant separation to show card behind
+            x: xOffset, 
             scale: 0.8, 
             zIndex: 10, 
             opacity: 0.5, 
-            filter: "blur(2px) brightness(0.6)", // Darker and blurred in back
+            filter: "blur(2px) brightness(0.6)", 
             rotateY: -15
         };
     } else {
-        // Left Side (offset === 2)
+        // Left Side 
         return { 
-            x: -240, // Symmetric separation
+            x: -xOffset, 
             scale: 0.8, 
             zIndex: 10, 
             opacity: 0.5, 
@@ -86,8 +93,8 @@ const AgencyVision = () => {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-8 perspective-1000">
-      <div className="relative w-full max-w-md h-[400px] flex items-center justify-center translate-y-8"> {/* Adjusted positions */}
+    <div className="w-full h-full flex items-center justify-center p-8 perspective-1000 mt-8 md:mt-0 max-w-[100vw] overflow-hidden">
+      <div className="relative w-full max-w-md h-[400px] flex items-center justify-center translate-y-8"> 
           {cards.map((card, index) => {
               const style = getCardStyle(index);
               return (
@@ -274,7 +281,7 @@ const Hero = () => {
         </motion.div>
 
         {/* RIGHT SIDE - 2D VISION TERMINAL */}
-        <div className="hidden md:block w-full h-full relative z-20 pointer-events-auto">
+        <div className="w-full h-full relative z-20 pointer-events-auto flex items-center justify-center">
              <AgencyVision />
         </div>
 
