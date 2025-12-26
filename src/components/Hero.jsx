@@ -4,18 +4,17 @@ const Hero = () => {
   return (
     <section className="relative w-full h-screen overflow-hidden bg-black">
       
-      {/* LOCAL VIDEO: sentient.mp4 */}
+      {/* REMOTE VIDEO: hero.mp4 */}
       <div className="absolute inset-0 z-0">
         <video 
+          src="https://owzleztogrxabkmqqqop.supabase.co/storage/v1/object/public/Assets/hero.mp4"
           autoPlay 
           muted 
           loop 
           playsInline
+          preload="none"
           className="w-full h-full object-cover opacity-50"
-        >
-          {/* Eğer sentient.mp4 yoksa video oynamaz ama hata da vermez */}
-          <source src="/sentient.mp4" type="video/mp4" />
-        </video>
+        />
 
         {/* Video yoksa/yüklenmezse diye SİYAH FON (Pixabay linki YOK) */}
         <div className="absolute inset-0 bg-black -z-10" />

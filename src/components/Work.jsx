@@ -1,55 +1,41 @@
 import React, { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useCursor } from "../context/CursorContext"; // EKLENDİ
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { useCursor } from "../context/CursorContext";
+import { supabase } from "../lib/supabaseClient";
 
-const projects = [
-  { 
-    id: 1,
-    title: "PALL_NET", 
-    tagline: "IMMERSIVE COMMERCE ECOSYSTEM",
-    desc: "Sıradan e-ticareti öldürdük. Müşteriyi içine çeken, nefes alan bir satış makinesi.",
-    video: "/videos/pallnet.mp4", 
-    link: "https://pall-net.vercel.app/",
-    cursorType: "square" // ÖZEL CURSOR TİPİ
-  },
-  { 
-    id: 2,
-    title: "SYNAPSE", 
-    tagline: "NEURAL NETWORK INTERFACE",
-    desc: "Kullanıcı deneyimi değil, kullanıcı hipnozu. Veri akışını sanata dönüştürdük.",
-    video: "/videos/synapse.mp4",
-    link: "https://synapse-digital-experience.vercel.app/",
-    cursorType: "triangle" // ÖZEL CURSOR TİPİ
-  },
-  { 
-    id: 3,
-    title: "JUST4FUN", 
-    tagline: "GAMIFIED REALITY ENGINE",
-    desc: "Sıkıcı kurumsal sitelere bir başkaldırı. Oyunlaştırma ile etkileşimi %400 artırdık.",
-    video: "/videos/just4fun.mp4",
-    link: "https://just4-fun-bekirerdem.vercel.app/",
-    cursorType: "pentagon" // ÖZEL CURSOR TİPİ
-  }
-];
+const CURSOR_TYPES = ["square", "triangle", "pentagon"];
 
 const ProjectCard = ({ project, index, setCursorVariant }) => {
+  const videoRef = useRef(null);
+  const containerRef = useRef(null);
+  const isInView = useInView(containerRef, { margin: "0px 0px -20% 0px", once: false });
+
+  useEffect(() => {
+    if (isInView && videoRef.current) {
+      videoRef.current.play().catch(e => console.log("Autoplay prevented:", e));
+    } else if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [isInView]);
+
   return (
     <a 
-      href={project.link} 
-      target="_blank" 
+      href={project.link}
+      target="_blank"
       rel="noopener noreferrer"
-      // EVENTLER BURAYA EKLENDİ
-      onMouseEnter={() => setCursorVariant(project.cursorType)}
-      onMouseLeave={() => setCursorVariant("default")}
+      ref={containerRef}
       className="relative w-[85vw] md:w-[60vw] h-[60vh] md:h-[70vh] shrink-0 group block border border-white/10 hover:border-[#CCFF00] transition-all duration-500 rounded-lg overflow-hidden bg-[#050505]"
+      onMouseEnter={() => setCursorVariant(CURSOR_TYPES[index % CURSOR_TYPES.length])}
+      onMouseLeave={() => setCursorVariant("default")}
     >
         <div className="w-full h-full relative">
           <video 
-            src={project.video}
-            autoPlay 
+            ref={videoRef}
+            src={project.video_url}
             muted 
             loop 
             playsInline
+            preload="none"
             className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 grayscale group-hover:grayscale-0"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90 group-hover:opacity-30 transition-opacity duration-500" />
@@ -60,15 +46,13 @@ const ProjectCard = ({ project, index, setCursorVariant }) => {
                  CASE 0{index+1}
                </span>
                <span className="text-[#CCFF00] font-mono text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-4 group-hover:translate-x-0 duration-300">
-                 // {project.tagline}
+                 // {project.category}
                </span>
              </div>
              <h3 className="text-5xl md:text-7xl font-black text-white font-clash uppercase leading-[0.85] mb-6 drop-shadow-lg">
                {project.title}
              </h3>
-             <p className="text-gray-300 font-mono text-sm md:text-lg max-w-xl border-l-2 border-[#CCFF00] pl-6 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 delay-100 bg-black/60 backdrop-blur-sm py-2 pr-4 rounded-r-lg">
-               {project.desc}
-             </p>
+             {/* Description removed as it's not in the new schema, keeping UI clean */}
           </div>
         </div>
     </a>
@@ -79,13 +63,23 @@ const Work = () => {
   const targetRef = useRef(null);
   const { setCursorVariant } = useCursor(); 
   
-  const [isMobile, setIsMobile] = React.useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [projects, setProjects] = useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const { data, error } = await supabase.from('projects').select('*').order('id');
+      if (data) setProjects(data);
+      if (error) console.error('Error fetching projects:', error);
+    };
+    fetchProjects();
   }, []);
 
   const { scrollYProgress } = useScroll({
@@ -134,7 +128,7 @@ const Work = () => {
 
           {/* PROJELER */}
           {projects.map((project, i) => (
-            <div key={i} className="w-full md:w-auto flex justify-center">
+            <div key={project.id || i} className="w-full md:w-auto flex justify-center">
                 <ProjectCard 
                 project={project} 
                 index={i} 
