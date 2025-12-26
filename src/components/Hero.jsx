@@ -199,7 +199,7 @@ const Hero = () => {
          
          {/* TOP ROW */}
          {/* Adjusted top position to avoid Navbar overlap */}
-         <div className="absolute top-24 left-0 w-full p-6 md:p-12 flex justify-between items-start z-30">
+         <div className="absolute top-32 md:top-24 left-0 w-full p-6 md:p-12 flex justify-between items-start z-30">
             <motion.div 
                initial={{ opacity: 0, x: -20 }}
                animate={{ opacity: 1, x: 0 }}
@@ -236,14 +236,14 @@ const Hero = () => {
       </div>
 
       {/* CENTER CONTENT */}
-      <div className="relative z-20 w-full h-full p-6 md:p-12 md:pt-32 grid grid-cols-1 md:grid-cols-[55%_45%] items-center">
+      <div className="relative z-20 w-full h-full p-6 md:p-12 md:pt-32 grid grid-cols-1 md:grid-cols-[55%_45%] items-center overflow-y-auto md:overflow-visible">
         
         {/* LEFT SIDE - TEXT */}
         <motion.div 
            initial={{ opacity: 0, x: -50 }}
            animate={{ opacity: 1, x: 0 }}
            transition={{ duration: 1, ease: "circOut" }}
-           className="flex flex-col items-start text-left pl-4 md:pl-12 z-30"
+           className="flex flex-col items-start text-left pl-4 md:pl-12 z-30 mt-32 md:mt-0"
         >
           <div className="mb-6 flex items-center gap-4 overflow-hidden">
              <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#CCFF00]" />

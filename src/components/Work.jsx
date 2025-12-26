@@ -24,7 +24,7 @@ const ProjectCard = ({ project, index, setCursorVariant }) => {
       target="_blank"
       rel="noopener noreferrer"
       ref={containerRef}
-      className="relative w-[85vw] md:w-[60vw] h-[300px] md:h-[70vh] shrink-0 group block border border-white/10 hover:border-[#CCFF00] transition-all duration-500 rounded-lg overflow-hidden bg-[#050505]"
+      className="relative w-[90vw] md:w-[60vw] aspect-[4/5] md:aspect-auto md:h-[70vh] shrink-0 group block border border-white/10 hover:border-[#CCFF00] transition-all duration-500 rounded-lg overflow-hidden bg-[#050505]"
       onMouseEnter={() => setCursorVariant(CURSOR_TYPES[index % CURSOR_TYPES.length])}
       onMouseLeave={() => setCursorVariant("default")}
     >
@@ -38,18 +38,18 @@ const ProjectCard = ({ project, index, setCursorVariant }) => {
             preload="metadata"
             className="absolute inset-0 w-full h-full object-cover opacity-100 grayscale-0 md:opacity-50 md:grayscale md:group-hover:opacity-100 md:group-hover:grayscale-0 md:group-hover:scale-105 transition-all duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-30 md:opacity-90 md:group-hover:opacity-30 transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 md:via-black/40 md:opacity-90 md:group-hover:opacity-30 transition-opacity duration-500" />
 
-          <div className="absolute bottom-0 left-0 p-8 md:p-12 w-full z-20 flex flex-col justify-end h-full">
-             <div className="flex items-center gap-4 mb-4">
-               <span className="px-3 py-1 bg-[#CCFF00] text-black text-xs font-bold uppercase tracking-widest rounded-sm">
+          <div className="absolute bottom-0 left-0 p-6 md:p-12 w-full z-20 flex flex-col justify-end h-full">
+             <div className="flex items-center gap-4 mb-2 md:mb-4">
+               <span className="px-2 py-1 md:px-3 md:py-1 bg-[#CCFF00] text-black text-[10px] md:text-xs font-bold uppercase tracking-widest rounded-sm">
                  CASE 0{index+1}
                </span>
-               <span className="text-[#CCFF00] font-mono text-xs uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-4 group-hover:translate-x-0 duration-300">
+               <span className="text-[#CCFF00] font-mono text-[10px] md:text-xs uppercase tracking-widest opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity transform md:-translate-x-4 md:group-hover:translate-x-0 duration-300">
                  // {project.category}
                </span>
              </div>
-             <h3 className="text-5xl md:text-7xl font-black text-white font-clash uppercase leading-[0.85] mb-6 drop-shadow-lg">
+             <h3 className="text-3xl md:text-7xl font-black text-white font-clash uppercase leading-[0.85] mb-2 md:mb-6 drop-shadow-lg break-words">
                {project.title}
              </h3>
              {/* Description removed as it's not in the new schema, keeping UI clean */}
