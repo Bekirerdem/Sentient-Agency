@@ -28,8 +28,8 @@
     color: white;
     font-family: 'Manrope', sans-serif;
     -webkit-font-smoothing: antialiased;
-    cursor: none;
-    position: relative; /* FIX: Ensure non-static container for Framer Motion */
+    cursor: none; /* Custom cursor enablement */
+    position: relative;
     overflow-x: hidden;
   }
   

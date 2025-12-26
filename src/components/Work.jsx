@@ -32,6 +32,7 @@ const ProjectCard = ({ project, index, setCursorVariant }) => {
           <video 
             ref={videoRef}
             src={project.video_url}
+            poster={project.poster_url}
             muted 
             loop 
             playsInline
