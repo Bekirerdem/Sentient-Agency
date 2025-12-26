@@ -175,7 +175,7 @@ const AgencyVision = () => {
 
 const Hero = () => {
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-black">
+    <section className="relative w-full min-h-screen md:h-screen overflow-hidden bg-black">
       
       {/* REMOTE VIDEO: hero.mp4 */}
       <div className="absolute inset-0 z-0">
@@ -198,8 +198,8 @@ const Hero = () => {
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center w-full h-full p-4 pointer-events-none">
          
          {/* TOP ROW */}
-         {/* Adjusted top position to avoid Navbar overlap */}
-         <div className="absolute top-32 md:top-24 left-0 w-full p-6 md:p-12 flex justify-between items-start z-30">
+         {/* Hidden on mobile, moved to flow content */}
+         <div className="hidden md:flex absolute top-24 left-0 w-full p-6 md:p-12 justify-between items-start z-30">
             <motion.div 
                initial={{ opacity: 0, x: -20 }}
                animate={{ opacity: 1, x: 0 }}
@@ -216,7 +216,7 @@ const Hero = () => {
          </div>
 
          {/* BOTTOM ROW */}
-         <div className="absolute bottom-0 left-0 w-full p-6 md:p-12 flex flex-col md:flex-row justify-between items-end gap-6 md:gap-0 z-30">
+         <div className="hidden md:flex absolute bottom-0 left-0 w-full p-6 md:p-12 flex-col md:flex-row justify-between items-end gap-6 md:gap-0 z-30">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -236,33 +236,48 @@ const Hero = () => {
       </div>
 
       {/* CENTER CONTENT */}
-      <div className="relative z-20 w-full h-full p-6 md:p-12 md:pt-32 grid grid-cols-1 md:grid-cols-[55%_45%] items-center overflow-y-auto md:overflow-visible">
+      {/* Changed overflow-y-auto to just allowing natural flow on mobile with min-h-screen container */}
+      <div className="relative z-20 w-full min-h-screen md:h-full p-6 md:p-12 pt-32 md:pt-32 grid grid-cols-1 md:grid-cols-[55%_45%] items-center content-center">
         
         {/* LEFT SIDE - TEXT */}
         <motion.div 
            initial={{ opacity: 0, x: -50 }}
            animate={{ opacity: 1, x: 0 }}
            transition={{ duration: 1, ease: "circOut" }}
-           className="flex flex-col items-start text-left pl-4 md:pl-12 z-30 mt-32 md:mt-0"
+           className="flex flex-col items-center md:items-start text-center md:text-left z-30 mb-12 md:mb-0 relative"
         >
-          <div className="mb-6 flex items-center gap-4 overflow-hidden">
+          {/* Mobile Spacer for Navbar */}
+          <div className="h-16 md:hidden" />
+
+          {/* System Status - Integrated into flow for mobile to avoid overlap */}
+          <div className="md:hidden mb-8 flex flex-col gap-1">
+               <span className="text-[10px] font-mono text-[#CCFF00] tracking-widest uppercase">
+                  System_Status: <span className="text-white animate-pulse">ONLINE</span>
+               </span>
+               <span className="text-[10px] font-mono text-white/40 tracking-widest">
+                  LOC: 41.0082° N, 28.9784° E
+               </span>
+          </div>
+
+          <div className="mb-6 flex items-center justify-center md:justify-start gap-4 overflow-hidden">
              <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#CCFF00]" />
              <span className="text-xs font-mono text-[#CCFF00] tracking-[0.5em] uppercase">
                 Architecture of Tomorrow
              </span>
+             <div className="md:hidden h-px w-12 bg-gradient-to-l from-transparent to-[#CCFF00]" />
           </div>
 
-          <h1 className="text-[10vw] md:text-[7.5vw] font-black text-white leading-[0.85] tracking-tight font-clash mix-blend-overlay">
+          <h1 className="text-[12vw] md:text-[7.5vw] font-black text-white leading-[0.85] tracking-tight font-clash mix-blend-overlay">
             SENTIENT
           </h1>
-          <h1 className="relative text-[10vw] md:text-[7.5vw] font-black text-transparent leading-[0.85] tracking-tight font-clash bg-clip-text bg-gradient-to-r from-white via-white/50 to-transparent z-10">
+          <h1 className="relative text-[12vw] md:text-[7.5vw] font-black text-transparent leading-[0.85] tracking-tight font-clash bg-clip-text bg-gradient-to-r from-white via-white/50 to-transparent z-10">
             REALITY
-            <span className="absolute -top-2 -right-6 text-xl md:text-3xl text-[#CCFF00] font-mono font-normal">
+            <span className="absolute -top-2 -right-4 md:-right-6 text-xl md:text-3xl text-[#CCFF00] font-mono font-normal">
                ®
             </span>
           </h1>
           
-          <p className="mt-8 text-xs md:text-base tracking-[0.15em] font-mono text-white/70 uppercase max-w-xl leading-relaxed border-l-2 border-[#CCFF00] pl-6">
+          <p className="mt-8 text-xs md:text-base tracking-[0.15em] font-mono text-white/70 uppercase max-w-xl leading-relaxed border-l-0 md:border-l-2 border-[#CCFF00] pl-0 md:pl-6">
             We build autonomous digital ecosystems that <br/>
             <span className="text-white font-bold">think</span>, <span className="text-white font-bold">adapt</span>, and <span className="text-white font-bold">evolve</span>. 
           </p>
@@ -281,7 +296,7 @@ const Hero = () => {
         </motion.div>
 
         {/* RIGHT SIDE - 2D VISION TERMINAL */}
-        <div className="w-full h-full relative z-20 pointer-events-auto flex items-center justify-center">
+        <div className="w-full h-[500px] md:h-full relative z-20 pointer-events-auto flex items-start md:items-center justify-center">
              <AgencyVision />
         </div>
 
