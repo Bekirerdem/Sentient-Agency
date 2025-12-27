@@ -12,7 +12,7 @@ const ServicesGrid = () => {
   const { setCursorVariant } = useCursor();
 
   return (
-    <section className="w-full bg-black py-32 px-6">
+    <section id="services" className="w-full bg-black py-32 px-6">
       <div className="container mx-auto max-w-[90vw]">
         
         {/* BENTO GRID YAPISI */}
@@ -33,13 +33,13 @@ const ServicesGrid = () => {
 
             <div className="relative z-10">
                <div className="inline-block px-3 py-1 border border-[#CCFF00] text-[#CCFF00] text-xs font-mono mb-6">
-                  AGENTS_DEPLOYED: 842
+                  AGENTS_DEPLOYED: 42
                </div>
-               <h3 className="text-8xl font-black text-white uppercase tracking-tighter mb-4">
-                 AI <br/> Workforce
+               <h3 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter mb-4">
+                 AI Integrated <br/> Design
                </h3>
                <p className="text-gray-400 max-w-md border-l-2 border-[#CCFF00] pl-6 py-2">
-                 Sıkıcı işleri unutun. Bizim ajanlarımız uyumaz, hata yapmaz ve zam istemez.
+                 Generative UI systems that adapt to user behavior in real-time. The interface is no longer static; it lives.
                </p>
             </div>
           </div>
@@ -58,14 +58,15 @@ const ServicesGrid = () => {
                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 4l6 14H6l6-14z"/></svg>
                </div>
                
-               <h3 className="text-3xl font-bold text-white uppercase mb-6">Neural Architecture</h3>
+               <h3 className="text-3xl font-bold text-white uppercase mb-4">Next-Gen Web Architecture</h3>
+               <p className="text-xs text-gray-500 font-mono mb-4">High-performance, scalable ecosystems built for the Web3 era.</p>
                
-               {/* TAG CLOUD (ORİJİNAL) */}
+               {/* TAG CLOUD (UPDATED) */}
                <div className="flex flex-wrap gap-3 content-start">
-                  {techStack.map((tech, i) => (
+                  {["N8N", "TYPESCRIPT", "NEXT.JS", "REACT-NATIVE", "REPLIT-DESIGN", "NODE.JS", "UNICORN.STUDIO"].map((tech, i) => (
                     <div 
                       key={i}
-                      className="px-4 py-2 border border-[#CCFF00]/30 text-[#CCFF00] text-xs font-bold uppercase tracking-widest hover:bg-[#CCFF00] hover:text-black transition-all cursor-default"
+                      className="px-3 py-1 border border-[#CCFF00]/30 text-[#CCFF00] text-[10px] font-bold uppercase tracking-widest hover:bg-[#CCFF00] hover:text-black transition-all cursor-default"
                     >
                       {tech}
                     </div>
@@ -74,7 +75,7 @@ const ServicesGrid = () => {
 
                {/* Alt Dekorasyon */}
                <div className="absolute bottom-4 right-4 text-[#CCFF00]/20 font-mono text-xs">
-                  // SYSTEM_READY
+                  // OPTIMIZED
                </div>
             </div>
 
@@ -84,10 +85,11 @@ const ServicesGrid = () => {
               onMouseEnter={() => setCursorVariant("pentagon")}
               onMouseLeave={() => setCursorVariant("default")}
             >
-               <div className="text-xs font-mono text-gray-500 uppercase">Impact Metrics</div>
+               <div className="text-xs font-mono text-gray-500 uppercase">Digital Strategy</div>
                
                <div>
-                 <div className="text-6xl font-black text-white mb-2">850% ROI</div>
+                 <h3 className="text-4xl font-black text-white mb-2 uppercase">Dominance</h3>
+                 <p className="text-xs text-gray-400">Data-driven roadmaps to crush competition through automation.</p>
                  
                  {/* İlerleme Çubuğu */}
                  <div className="w-full h-1 bg-gray-800 mt-4 overflow-hidden">
@@ -101,8 +103,8 @@ const ServicesGrid = () => {
                </div>
 
                <div className="flex justify-between text-xs font-mono text-gray-400 mt-4">
-                  <span>Active Agents: 42</span>
-                  <span className="text-[#CCFF00]">Error Rate: &lt;0.01%</span>
+                  <span>Growth: +850%</span>
+                  <span className="text-[#CCFF00]">Risk: MINIMAL</span>
                </div>
             </div>
 

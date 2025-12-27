@@ -14,26 +14,97 @@ const Cursor = () => {
     return () => window.removeEventListener("mousemove", mouseMove);
   }, []);
 
-  // Ultra-minimal "Sentient" Cursor
+  const variants = {
+    default: {
+      x: mousePosition.x - 6,
+      y: mousePosition.y - 6,
+      height: 12,
+      width: 12,
+      backgroundColor: "#CCFF00",
+      mixBlendMode: "normal",
+      borderRadius: "50%",
+      scale: 1,
+      opacity: 1,
+      clipPath: "none",
+      transition: {
+        type: "spring",
+        mass: 0.5,
+        clipPath: { duration: 0 } // INSTANT SWITCH to prevent glitch
+      }
+    },
+    text: {
+      x: mousePosition.x - 32,
+      y: mousePosition.y - 32,
+      height: 64,
+      width: 64,
+      backgroundColor: "#CCFF00",
+      mixBlendMode: "difference", 
+      borderRadius: "50%",
+      scale: 1,
+      opacity: 0.5,
+      clipPath: "none",
+    },
+    square: {
+      x: mousePosition.x - 24,
+      y: mousePosition.y - 24,
+      height: 48,
+      width: 48,
+      backgroundColor: "#CCFF00",
+      borderRadius: "0%", // SQUARE
+      mixBlendMode: "difference",
+      scale: 1,
+      opacity: 0.8,
+      rotate: 45,
+      clipPath: "none",
+    },
+    triangle: {
+      x: mousePosition.x - 24,
+      y: mousePosition.y - 24,
+      height: 48,
+      width: 48,
+      backgroundColor: "#CCFF00",
+      borderRadius: "0%",
+      clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)", // TRIANGLE
+      mixBlendMode: "difference",
+      scale: 1,
+      opacity: 0.8,
+    },
+    pentagon: {
+      x: mousePosition.x - 24,
+      y: mousePosition.y - 24,
+      height: 48,
+      width: 48,
+      backgroundColor: "#CCFF00",
+      borderRadius: "0%",
+      clipPath: "polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)", // PENTAGON
+      mixBlendMode: "difference",
+      scale: 1,
+      opacity: 0.8,
+    },
+    diamond: {
+        x: mousePosition.x - 24,
+        y: mousePosition.y - 24,
+        height: 48,
+        width: 48,
+        backgroundColor: "#CCFF00",
+        borderRadius: "0%",
+        clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)", // DIAMOND
+        mixBlendMode: "difference",
+        scale: 1,
+        opacity: 0.8,
+      }
+  };
+
   return (
     <motion.div
-      className="hidden md:block fixed top-0 left-0 z-[9999] pointer-events-none rounded-full mix-blend-difference bg-[#CCFF00]"
-      animate={{
-        x: mousePosition.x - 6,
-        y: mousePosition.y - 6,
-        scale: cursorVariant === "text" ? 2 : 1,
-        opacity: 1
-      }}
+      className="hidden md:block fixed top-0 left-0 z-[9999] pointer-events-none"
+      variants={variants}
+      animate={cursorVariant}
       transition={{
         type: "spring",
-        stiffness: 1500,
-        damping: 100,
-        mass: 0.1
-      }}
-      style={{
-        width: 12,
-        height: 12,
-        boxShadow: "0 0 10px rgba(204,255,0,0.8)"
+        stiffness: 800,
+        damping: 40,
+        mass: 0.5
       }}
     />
   );

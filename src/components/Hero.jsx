@@ -175,7 +175,7 @@ const AgencyVision = () => {
 
 const Hero = () => {
   return (
-    <section className="relative w-full min-h-screen md:h-screen overflow-hidden bg-black">
+    <section id="home" className="relative w-full min-h-screen md:h-screen overflow-hidden bg-black">
       
       {/* REMOTE VIDEO: hero.mp4 */}
       <div className="absolute inset-0 z-0">

@@ -93,7 +93,7 @@ const Work = () => {
   return (
     <section 
       ref={targetRef} 
-      id="works" 
+      id="projects" 
       className="relative bg-black h-auto md:h-[300vh]" 
       style={{ position: "relative" }}
     >

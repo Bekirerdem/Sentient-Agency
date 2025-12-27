@@ -14,7 +14,7 @@ const Navbar = () => {
     return () => { document.body.style.overflow = 'auto'; };
   }, [isOpen]);
 
-  const navLinks = ['Manifesto', 'Services', 'Process', 'Works'];
+  const navLinks = ['Home', 'Manifesto', 'Projects', 'Services', 'Process', 'Contact'];
 
   return (
     <>
@@ -46,17 +46,22 @@ const Navbar = () => {
         </motion.div>
 
         {/* DESKTOP MENU */}
-        <div className="hidden md:flex items-center gap-1 p-1 bg-black/50 backdrop-blur-md rounded-sm border border-white/10">
+        <div className="hidden md:flex items-center gap-2 p-1 bg-black/50 backdrop-blur-md rounded-sm border border-white/10">
           {navLinks.map((item) => (
             <motion.a 
                 key={item} 
                 href={`#${item.toLowerCase()}`} 
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, textShadow: "0 0 8px rgba(204,255,0,0.5)" }}
                 whileTap={{ scale: 0.95 }}
-                className="relative px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-white hover:text-[#CCFF00] transition-colors overflow-hidden"
+                className="relative px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-white/80 hover:text-[#CCFF00] transition-all overflow-hidden"
             >
               {item}
-              <div className="absolute inset-0 bg-[#CCFF00]/10 opacity-0 hover:opacity-100 transition-opacity -z-10" />
+              <motion.div 
+                className="absolute bottom-0 left-0 w-full h-[1px] bg-[#CCFF00]"
+                initial={{ scaleX: 0 }}
+                whileHover={{ scaleX: 1 }}
+                transition={{ duration: 0.3 }}
+              />
             </motion.a>
           ))}
         </div>
@@ -65,6 +70,7 @@ const Navbar = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.95 }}
             className="hidden md:block group"
+            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
         >
             <div className="px-6 py-3 text-[10px] font-black text-[#CCFF00] border border-[#CCFF00] bg-transparent transition-all duration-300 tracking-widest uppercase group-hover:bg-[#CCFF00] group-hover:text-black">
                 BOOK DEMO
@@ -125,7 +131,13 @@ const Navbar = () => {
                   transition={{ delay: 0.6 }}
                   className="mt-12"
                 >
-                  <button className="px-10 py-5 text-sm font-black text-black bg-[#CCFF00] uppercase tracking-widest hover:bg-white transition-colors">
+                  <button 
+                    onClick={() => {
+                        setIsOpen(false);
+                        document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="px-10 py-5 text-sm font-black text-black bg-[#CCFF00] uppercase tracking-widest hover:bg-white transition-colors"
+                  >
                     BOOK DEMO
                   </button>
                 </motion.div>
