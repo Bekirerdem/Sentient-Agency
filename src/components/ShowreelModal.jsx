@@ -1,7 +1,122 @@
-import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
+// --- AMBIENCE AUDIO (Heartbeat / Underwater) ---
+const HeartbeatAmbience = () => {
+    useEffect(() => {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+
+        // Create a Lowpass Filter for "Underwater" feel
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 150; 
+        filter.connect(ctx.destination);
+
+        // Heartbeat Sound Generator
+        const playPulse = (time) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            
+            osc.frequency.setValueAtTime(45, time); // Low thud
+            osc.frequency.exponentialRampToValueAtTime(30, time + 0.15);
+            
+            gain.gain.setValueAtTime(0.5, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+            
+            osc.connect(gain);
+            gain.connect(filter);
+            
+            osc.start(time);
+            osc.stop(time + 0.2);
+        };
+
+        // Scheduler for heartbeat rhythm (lub-dub ....... lub-dub)
+        let nextTime = ctx.currentTime + 0.1;
+        const schedule = () => {
+            if (ctx.state === 'closed') return;
+            
+            // Lub
+            playPulse(nextTime);
+            // Dub
+            playPulse(nextTime + 0.15);
+            
+            // Next heartbeat in 1.2 seconds roughly
+            nextTime += 1.2;
+            
+            // Background Drone (Perpetual low hum)
+            // We'll just re-trigger or keep a constant oscillator if we wanted, 
+            // but the prompt asked for "Deep Underwater/Heartbeat".
+            // Let's add a very subtle constant drone.
+            if (!droneStarted) {
+               startDrone(ctx, filter);
+               droneStarted = true;
+            }
+            
+            timeoutId = setTimeout(schedule, 1000);
+        };
+        
+        // Drone logic
+        let droneStarted = false;
+        const startDrone = (context, dest) => {
+            const osc = context.createOscillator();
+            const gain = context.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 35;
+            gain.gain.value = 0.15;
+            osc.connect(gain);
+            gain.connect(dest);
+            osc.start();
+        };
+
+        let timeoutId = setTimeout(schedule, 100);
+
+        return () => {
+            clearTimeout(timeoutId);
+            ctx.close();
+        };
+    }, []);
+
+    return null;
+};
+
+// --- MAIN COMPONENT ---
 const ShowreelModal = ({ isOpen, onClose }) => {
+  const [activeVideo, setActiveVideo] = useState("bloom"); // 'bloom' or 'seed'
+  
+  const bloomRef = useRef(null);
+  const seedRef = useRef(null);
+
+  const bloomUrl = "https://owzleztogrxabkmqqqop.supabase.co/storage/v1/object/public/Assets/bloom.mp4";
+  const seedUrl = "https://owzleztogrxabkmqqqop.supabase.co/storage/v1/object/public/Assets/seed.mp4";
+
+  // Handle Sequence Logic
+  const handleBloomEnded = () => {
+      // Bloom finished, play Seed
+      if (seedRef.current) {
+          seedRef.current.currentTime = 0;
+          seedRef.current.play().then(() => {
+              setActiveVideo("seed");
+              // Reset bloom for next time
+             // if (bloomRef.current) bloomRef.current.pause(); 
+          });
+      }
+  };
+
+  const handleSeedEnded = () => {
+      // Seed finished, loop back to Bloom
+      if (bloomRef.current) {
+          bloomRef.current.currentTime = 0;
+          bloomRef.current.play().then(() => {
+              setActiveVideo("bloom");
+              // Reset seed
+             // if (seedRef.current) seedRef.current.pause();
+          });
+      }
+  };
+
+  // Close Logic
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
@@ -10,6 +125,12 @@ const ShowreelModal = ({ isOpen, onClose }) => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
       window.addEventListener("keydown", handleKeyDown);
+      
+      // Initial Play
+      // setTimeout to ensure ref is mounted
+      setTimeout(() => {
+         if (bloomRef.current) bloomRef.current.play();
+      }, 100);
     }
 
     return () => {
@@ -20,84 +141,78 @@ const ShowreelModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const assets = [
-    {
-      title: "Synapse",
-      src: "https://owzleztogrxabkmqqqop.supabase.co/storage/v1/object/public/Assets/Synapse.mp4",
-      className: "md:col-span-2 md:row-span-2",
-    },
-    {
-      title: "Pal Affiliates",
-      src: "https://owzleztogrxabkmqqqop.supabase.co/storage/v1/object/public/Assets/Pal%20Affiliates.mp4",
-      className: "md:col-span-1 md:row-span-1",
-    },
-    {
-      title: "Just4Fun",
-      src: "https://owzleztogrxabkmqqqop.supabase.co/storage/v1/object/public/Assets/Just4Fun.mp4",
-      className: "md:col-span-1 md:row-span-1",
-    },
-  ];
-
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8">
-      {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="absolute inset-0 bg-black/90 backdrop-blur-xl"
-      />
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black overflow-hidden backdrop-blur-3xl">
+      
+      {/* AMBIENCE */}
+      <HeartbeatAmbience />
 
-      {/* Close Button */}
-      <button
-        onClick={onClose}
-        className="absolute top-6 right-6 z-[220] group flex items-center gap-3 text-white/50 hover:text-white transition-colors cursor-pointer"
+      {/* SCANLINE / NOISE OVERLAY */}
+      <div 
+        className="absolute inset-0 z-[205] pointer-events-none opacity-30 mix-blend-overlay"
+        style={{
+            backgroundImage: `repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 1px,
+                #000 2px,
+                #000 3px
+            ), url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+        }}
+      />
+      
+      {/* VIGNETTE */}
+      <div className="absolute inset-0 z-[205] pointer-events-none bg-[radial-gradient(circle_at_center,transparent_50%,#000000_100%)]" />
+
+      {/* VIDEO CONTAINER */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="relative w-full h-full max-w-7xl max-h-[90vh] flex items-center justify-center"
       >
-        <span className="font-mono text-xs tracking-[0.2em] uppercase hidden md:block group-hover:tracking-[0.3em] transition-all">
-          Close
-        </span>
-        <div className="w-10 h-10 border border-white/20 rounded-full flex items-center justify-center group-hover:border-[#CCFF00] group-hover:text-[#CCFF00] transition-colors">
-          ✕
-        </div>
+          {/* BLOOM PLAYBACK */}
+          <video
+             ref={bloomRef}
+             src={bloomUrl}
+             className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-0 ${activeVideo === 'bloom' ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+             muted // Auto-play usually requires muted usually, but this is a user-initiated modal so we might get away with sound if we added it, but prompt says "Ambience sound", doesn't specify video sound.
+             playsInline
+             onEnded={handleBloomEnded}
+          />
+
+          {/* SEED PLAYBACK */}
+          <video
+             ref={seedRef}
+             src={seedUrl}
+             className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-0 ${activeVideo === 'seed' ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+             muted 
+             playsInline
+             onEnded={handleSeedEnded}
+          />
+          
+          {/* DECORATIVE HUD TEXT */}
+          <div className="absolute bottom-10 left-10 z-[210] font-mono text-[#CCFF00] text-xs tracking-widest opacity-70">
+              SEQUENCE: {activeVideo === 'bloom' ? 'PHASE_1_INCUBATION' : 'PHASE_2_MITOSIS'}
+              <br/>
+              STATUS: LIVE_RENDERING
+          </div>
+
+      </motion.div>
+
+      {/* CLOSE BUTTON */}
+      <button 
+        onClick={onClose}
+        className="absolute top-8 right-8 z-[220] group flex items-center gap-3 cursor-pointer"
+      >
+          <span className="font-mono text-[#CCFF00] text-xs tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-opacity">
+              ABORT SEQUENCE
+          </span>
+          <div className="w-12 h-12 bg-black/50 border border-[#CCFF00] text-[#CCFF00] flex items-center justify-center rounded-sm hover:bg-[#CCFF00] hover:text-black transition-all duration-300">
+              ✕
+          </div>
       </button>
 
-      {/* Content Container */}
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative z-[210] w-full max-w-7xl h-full max-h-[85vh] grid grid-cols-1 md:grid-cols-3 grid-rows-3 md:grid-rows-2 gap-4"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking content
-      >
-        {assets.map((asset, index) => (
-          <div
-            key={asset.title}
-            className={`relative overflow-hidden rounded-xl bg-neutral-900 border border-white/5 group ${asset.className}`}
-          >
-            {/* Label */}
-            <div className="absolute top-4 left-4 z-10 px-3 py-1 bg-black/50 backdrop-blur-md rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span className="text-[10px] font-mono text-[#CCFF00] tracking-widest uppercase">
-                {asset.title}
-              </span>
-            </div>
-
-            {/* Video */}
-            <video
-              src={asset.src}
-              className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-500 scale-105 group-hover:scale-100 transition-transform duration-700"
-              autoPlay
-              muted
-              loop
-              playsInline
-            />
-            
-            {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-40 transition-opacity" />
-          </div>
-        ))}
-      </motion.div>
     </div>
   );
 };
