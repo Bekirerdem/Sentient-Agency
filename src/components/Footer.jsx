@@ -7,73 +7,26 @@ const Footer = () => {
       {/* Grid Arka Plan */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20 pointer-events-none" />
 
-      {/* CONTACT CTA SECTION */}
-      <div className="container mx-auto px-6 mb-24 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div>
-                <p className="text-[#CCFF00] font-mono text-xs tracking-[0.3em] mb-4 uppercase">
-                    // Ready to Evolve?
-                </p>
-                <h2 className="text-5xl md:text-7xl font-black font-clash uppercase leading-[0.9] mb-8">
-                    LET'S BUILD <br/> THE <span className="text-transparent stroke-text-white">IMPOSSIBLE</span>
-                </h2>
-                <p className="text-gray-400 max-w-md mb-8">
-                    Stop competing. Start dominating. Tell us about your vision.
-                </p>
-                <a href="mailto:hello@sentient.agency" className="inline-block px-10 py-5 bg-[#CCFF00] text-black font-bold uppercase tracking-widest hover:bg-white transition-colors">
-                    Start a Project
-                </a>
-            </div>
-
-            {/* CONTACT FORM - RE-DESIGNED (MINIMAL / TERMINAL STYLE) */}
-            <div className="w-full">
-                <form className="flex flex-col gap-8">
-                    
-                    <div className="group relative">
-                        <input type="text" placeholder=" " className="peer w-full bg-transparent border-b border-gray-800 py-4 text-white text-xl font-mono focus:border-[#CCFF00] focus:outline-none transition-colors" />
-                        <label className="absolute left-0 top-4 text-gray-500 text-sm font-mono transition-all peer-focus:-top-4 peer-focus:text-[#CCFF00] peer-focus:text-xs peer-[&:not(:placeholder-shown)]:-top-4 peer-[&:not(:placeholder-shown)]:text-xs">
-                           // ENTER_IDENTITY
-                        </label>
-                    </div>
-
-                    <div className="group relative">
-                        <input type="email" placeholder=" " className="peer w-full bg-transparent border-b border-gray-800 py-4 text-white text-xl font-mono focus:border-[#CCFF00] focus:outline-none transition-colors" />
-                        <label className="absolute left-0 top-4 text-gray-500 text-sm font-mono transition-all peer-focus:-top-4 peer-focus:text-[#CCFF00] peer-focus:text-xs peer-[&:not(:placeholder-shown)]:-top-4 peer-[&:not(:placeholder-shown)]:text-xs">
-                           // SIGNAL_FREQUENCY (EMAIL)
-                        </label>
-                    </div>
-
-                    <div className="group relative">
-                         <textarea rows="1" placeholder=" " className="peer w-full bg-transparent border-b border-gray-800 py-4 text-white text-xl font-mono focus:border-[#CCFF00] focus:outline-none transition-colors resize-none h-14 min-h-[56px]"></textarea>
-                         <label className="absolute left-0 top-4 text-gray-500 text-sm font-mono transition-all peer-focus:-top-4 peer-focus:text-[#CCFF00] peer-focus:text-xs peer-[&:not(:placeholder-shown)]:-top-4 peer-[&:not(:placeholder-shown)]:text-xs">
-                            // TRANSMISSION_DATA
-                         </label>
-                    </div>
-
-                    <button type="submit" className="self-start mt-4 px-8 py-4 border border-[#CCFF00] text-[#CCFF00] font-bold uppercase tracking-widest hover:bg-[#CCFF00] hover:text-black transition-all flex items-center gap-4 group">
-                        <span className="group-hover:translate-x-1 transition-transform">INITIALIZE</span>
-                        <span className="text-xl">→</span>
-                    </button>
-                </form>
-            </div>
-        </div>
+      {/* CONTACT CTA SECTION - MINIMALIST */}
+      <div className="container mx-auto px-6 mb-32 relative z-10 flex flex-col items-center text-center">
+         <p className="text-[#CCFF00] font-mono text-xs tracking-[0.5em] mb-6 uppercase">
+            // Start The Conversation
+         </p>
+         <h2 className="text-6xl md:text-9xl font-black font-clash uppercase leading-none tracking-tighter mb-12 mix-blend-difference">
+            Let's Build <br/> The Future
+         </h2>
+         <a 
+           href="mailto:hello@sentient.agency" 
+           className="px-12 py-6 border border-[#CCFF00] text-[#CCFF00] font-bold uppercase tracking-[0.2em] hover:bg-[#CCFF00] hover:text-black transition-all duration-300 clip-path-slant"
+         >
+            Email Us
+         </a>
       </div>
 
       <div className="container px-6 mx-auto relative z-10">
         
         {/* ÜST KISIM: DEVASA CTA */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-32 border-b border-white/10 pb-20">
-           <div>
-              <p className="text-[#CCFF00] font-mono mb-4 tracking-widest">// NEXT STEP</p>
-              <h2 className="text-[10vw] font-black text-white uppercase font-clash leading-[0.8]">
-                ACTIVATE <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#CCFF00] to-white">FUTURE.</span>
-              </h2>
-           </div>
-           
-           <button className="mt-10 md:mt-0 px-12 py-6 bg-[#CCFF00] text-black text-xl font-black uppercase tracking-widest hover:bg-white hover:scale-105 transition-all clip-path-slant">
-              Start Project_
-           </button>
-        </div>
+
 
         {/* ORTA KISIM: DETAYLAR */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">

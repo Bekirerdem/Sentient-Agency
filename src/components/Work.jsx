@@ -37,23 +37,26 @@ const ProjectCard = ({ project, index, setCursorVariant }) => {
             loop 
             playsInline
             preload="metadata"
-            className="absolute inset-0 w-full h-full object-cover opacity-100 grayscale-0 md:opacity-50 md:grayscale md:group-hover:opacity-100 md:group-hover:grayscale-0 md:group-hover:scale-105 transition-all duration-700"
+            className="absolute inset-0 w-full h-full object-cover opacity-100 grayscale-0 md:grayscale md:group-hover:grayscale-0 transition-all duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 md:via-black/40 md:opacity-90 md:group-hover:opacity-30 transition-opacity duration-500" />
-
-          <div className="absolute bottom-0 left-0 p-6 md:p-12 w-full z-20 flex flex-col justify-end h-full">
-             <div className="flex items-center gap-4 mb-2 md:mb-4">
-               <span className="px-2 py-1 md:px-3 md:py-1 bg-[#CCFF00] text-black text-[10px] md:text-xs font-bold uppercase tracking-widest rounded-sm">
-                 CASE 0{index+1}
-               </span>
-               <span className="text-[#CCFF00] font-mono text-[10px] md:text-xs uppercase tracking-widest opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity transform md:-translate-x-4 md:group-hover:translate-x-0 duration-300">
+          
+          {/* GLASSMORPHISM INFO STRIP (BOTTOM) */}
+          <div className="absolute bottom-0 left-0 w-full bg-black/60 backdrop-blur-md border-t border-white/10 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500 flex justify-between items-end">
+             <div className="flex flex-col gap-1">
+               <span className="text-[#CCFF00] font-mono text-[10px] uppercase tracking-widest">
                  // {project.category}
                </span>
+               <h3 className="text-2xl md:text-3xl font-black text-white font-clash uppercase leading-none">
+                 {project.title}
+               </h3>
              </div>
-             <h3 className="text-3xl md:text-7xl font-black text-white font-clash uppercase leading-[0.85] mb-2 md:mb-6 drop-shadow-lg break-words">
-               {project.title}
-             </h3>
-             {/* Description removed as it's not in the new schema, keeping UI clean */}
+             
+             <div className="flex items-center gap-2 text-white group-hover:text-[#CCFF00] transition-colors">
+                <span className="text-[10px] font-bold uppercase tracking-widest hidden md:block">View Case</span>
+                <div className="w-8 h-8 border border-white/20 rounded-full flex items-center justify-center group-hover:border-[#CCFF00] transition-colors">
+                   <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+                </div>
+             </div>
           </div>
         </div>
     </a>
