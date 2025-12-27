@@ -88,8 +88,8 @@ const ShowreelModal = ({ isOpen, onClose }) => {
   const bloomRef = useRef(null);
   const seedRef = useRef(null);
 
-  const bloomUrl = "https://owzleztogrxabkmqqqop.supabase.co/storage/v1/object/public/Assets/bloom.mp4";
-  const seedUrl = "https://owzleztogrxabkmqqqop.supabase.co/storage/v1/object/public/Assets/seed.mp4";
+  const bloomUrl = "/bloom.mp4";
+  const seedUrl = "/seed.mp4";
 
   // Handle Sequence Logic
   const handleBloomEnded = () => {
