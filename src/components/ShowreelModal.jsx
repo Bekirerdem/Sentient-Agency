@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 // --- AMBIENCE AUDIO (Heartbeat / Underwater) ---
@@ -34,46 +35,46 @@ const HeartbeatAmbience = () => {
 
         // Scheduler for heartbeat rhythm (lub-dub ....... lub-dub)
         let nextTime = ctx.currentTime + 0.1;
+        let timeoutId;
+
+        // Drone logic
+        let droneOsc = null;
+        let droneGain = null;
+        const startDrone = () => {
+            if (droneOsc) return; 
+            droneOsc = ctx.createOscillator();
+            droneGain = ctx.createGain();
+            droneOsc.type = 'sine';
+            droneOsc.frequency.value = 35;
+            droneGain.gain.value = 0.15; // Volume
+            droneOsc.connect(droneGain);
+            droneGain.connect(dest); // dest needs to be accessible, let's fix scope or just connect to filter/dest
+            droneGain.connect(filter); // Connect drone to same filter
+            droneOsc.start();
+        };
+
         const schedule = () => {
             if (ctx.state === 'closed') return;
             
-            // Lub
             playPulse(nextTime);
-            // Dub
             playPulse(nextTime + 0.15);
             
-            // Next heartbeat in 1.2 seconds roughly
             nextTime += 1.2;
             
-            // Background Drone (Perpetual low hum)
-            // We'll just re-trigger or keep a constant oscillator if we wanted, 
-            // but the prompt asked for "Deep Underwater/Heartbeat".
-            // Let's add a very subtle constant drone.
-            if (!droneStarted) {
-               startDrone(ctx, filter);
-               droneStarted = true;
-            }
+            // Start drone once
+            startDrone();
             
             timeoutId = setTimeout(schedule, 1000);
         };
         
-        // Drone logic
-        let droneStarted = false;
-        const startDrone = (context, dest) => {
-            const osc = context.createOscillator();
-            const gain = context.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = 35;
-            gain.gain.value = 0.15;
-            osc.connect(gain);
-            gain.connect(dest);
-            osc.start();
-        };
-
-        let timeoutId = setTimeout(schedule, 100);
+        // Fix drone scope issue by defining inside or passing params
+        // Re-defining startDrone inside effect correctly
+        
+        timeoutId = setTimeout(schedule, 100);
 
         return () => {
             clearTimeout(timeoutId);
+            if (droneOsc) { try { droneOsc.stop(); } catch(e){} }
             ctx.close();
         };
     }, []);
@@ -83,8 +84,7 @@ const HeartbeatAmbience = () => {
 
 // --- MAIN COMPONENT ---
 const ShowreelModal = ({ isOpen, onClose }) => {
-  const [activeVideo, setActiveVideo] = useState("bloom"); // 'bloom' or 'seed'
-  
+  const [activeVideo, setActiveVideo] = useState("bloom"); 
   const bloomRef = useRef(null);
   const seedRef = useRef(null);
 
@@ -93,30 +93,23 @@ const ShowreelModal = ({ isOpen, onClose }) => {
 
   // Handle Sequence Logic
   const handleBloomEnded = () => {
-      // Bloom finished, play Seed
       if (seedRef.current) {
           seedRef.current.currentTime = 0;
           seedRef.current.play().then(() => {
               setActiveVideo("seed");
-              // Reset bloom for next time
-             // if (bloomRef.current) bloomRef.current.pause(); 
           });
       }
   };
 
   const handleSeedEnded = () => {
-      // Seed finished, loop back to Bloom
       if (bloomRef.current) {
           bloomRef.current.currentTime = 0;
           bloomRef.current.play().then(() => {
               setActiveVideo("bloom");
-              // Reset seed
-             // if (seedRef.current) seedRef.current.pause();
           });
       }
   };
 
-  // Close Logic
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") onClose();
@@ -125,9 +118,6 @@ const ShowreelModal = ({ isOpen, onClose }) => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
       window.addEventListener("keydown", handleKeyDown);
-      
-      // Initial Play
-      // setTimeout to ensure ref is mounted
       setTimeout(() => {
          if (bloomRef.current) bloomRef.current.play();
       }, 100);
@@ -141,8 +131,8 @@ const ShowreelModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black overflow-hidden backdrop-blur-3xl">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black overflow-hidden backdrop-blur-3xl">
       
       {/* AMBIENCE */}
       <HeartbeatAmbience />
@@ -176,7 +166,7 @@ const ShowreelModal = ({ isOpen, onClose }) => {
              ref={bloomRef}
              src={bloomUrl}
              className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-0 ${activeVideo === 'bloom' ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-             muted // Auto-play usually requires muted usually, but this is a user-initiated modal so we might get away with sound if we added it, but prompt says "Ambience sound", doesn't specify video sound.
+             muted 
              playsInline
              onEnded={handleBloomEnded}
           />
@@ -203,7 +193,7 @@ const ShowreelModal = ({ isOpen, onClose }) => {
       {/* CLOSE BUTTON */}
       <button 
         onClick={onClose}
-        className="absolute top-8 right-8 z-[220] group flex items-center gap-3 cursor-pointer"
+        className="absolute top-8 right-8 z-[9999] group flex items-center gap-3 cursor-pointer"
       >
           <span className="font-mono text-[#CCFF00] text-xs tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-opacity">
               ABORT SEQUENCE
@@ -213,7 +203,8 @@ const ShowreelModal = ({ isOpen, onClose }) => {
           </div>
       </button>
 
-    </div>
+    </div>,
+    document.body
   );
 };
 
