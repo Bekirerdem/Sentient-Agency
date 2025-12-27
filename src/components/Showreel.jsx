@@ -1,64 +1,216 @@
-import { useRef, useState, useMemo } from "react";
-import { motion, useSpring, AnimatePresence } from "framer-motion";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Points, PointMaterial } from "@react-three/drei";
-import * as THREE from "three";
+import { useRef, useMemo, useState, useEffect } from 'react';
+import { Canvas, useFrame, extend, useThree } from '@react-three/fiber';
+import { shaderMaterial, Html } from '@react-three/drei';
+import * as THREE from 'three';
+import { motion, useSpring, AnimatePresence } from 'framer-motion';
+import ShowreelModal from './ShowreelModal';
 
-// --- R3F POINT CLOUD ---
-const ParticleField = () => {
-  const ref = useRef();
+// --- GLSL NOISE & SHADER ---
+// A simple 3D noise function for the vertex shader
+const noiseGLSL = `
+  vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+  vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+  vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+  vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
   
-  // Generate stable random points
-  const positions = useMemo(() => {
-    const count = 3000; // Point count
-    const array = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const theta = THREE.MathUtils.randFloatSpread(360); 
-      const phi = THREE.MathUtils.randFloatSpread(360); 
+  float snoise(vec3 v) {
+    const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+    const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+    
+    // First corner
+    vec3 i  = floor(v + dot(v, C.yyy) );
+    vec3 x0 = v - i + dot(i, C.xxx) ;
+    
+    // Other corners
+    vec3 g = step(x0.yzx, x0.xyz);
+    vec3 l = 1.0 - g;
+    vec3 i1 = min( g.xyz, l.zxy );
+    vec3 i2 = max( g.xyz, l.zxy );
+    
+    //   x0 = x0 - 0.0 + 0.0 * C.xxx;
+    //   x1 = x0 - i1  + 1.0 * C.xxx;
+    //   x2 = x0 - i2  + 2.0 * C.xxx;
+    //   x3 = x0 - 1.0 + 3.0 * C.xxx;
+    vec3 x1 = x0 - i1 + C.xxx;
+    vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
+    vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
+    
+    // Permutations
+    i = mod289(i); 
+    vec4 p = permute( permute( permute( 
+               i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+             + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
+             + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+             
+    // Gradients: 7x7 points over a square, mapped onto an octahedron.
+    // The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
+    float n_ = 0.142857142857; // 1.0/7.0
+    vec3  ns = n_ * D.wyz - D.xzx;
+    
+    vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)
+    
+    vec4 x_ = floor(j * ns.z);
+    vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)
+    
+    vec4 x = x_ *ns.x + ns.yyyy;
+    vec4 y = y_ *ns.x + ns.yyyy;
+    vec4 h = 1.0 - abs(x) - abs(y);
+    
+    vec4 b0 = vec4( x.xy, y.xy );
+    vec4 b1 = vec4( x.zw, y.zw );
+    
+    vec4 s0 = floor(b0)*2.0 + 1.0;
+    vec4 s1 = floor(b1)*2.0 + 1.0;
+    vec4 sh = -step(h, vec4(0.0));
+    
+    vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+    vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+    
+    vec3 p0 = vec3(a0.xy,h.x);
+    vec3 p1 = vec3(a0.zw,h.y);
+    vec3 p2 = vec3(a1.xy,h.z);
+    vec3 p3 = vec3(a1.zw,h.w);
+    
+    //Normalise gradients
+    vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+    p0 *= norm.x;
+    p1 *= norm.y;
+    p2 *= norm.z;
+    p3 *= norm.w;
+    
+    // Mix final noise value
+    vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+    m = m * m;
+    return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
+                                  dot(p2,x2), dot(p3,x3) ) );
+  }
+`;
+
+const LiquidMaterial = shaderMaterial(
+  {
+    uTime: 0,
+    uMouse: new THREE.Vector2(0, 0),
+    uResolution: new THREE.Vector2(1, 1),
+  },
+  // Vertex Shader
+  `
+    varying vec2 vUv;
+    varying float vElevation;
+    varying vec3 vNormal;
+    varying vec3 vViewPosition;
+    
+    uniform float uTime;
+    uniform vec2 uMouse;
+
+    ${noiseGLSL}
+
+    void main() {
+      vUv = uv;
+      vec3 pos = position; // Start with plane geometry position
+
+      // Calculate distance to mouse in world space (mapped approximately)
+      // Since plane is centered, uMouse is roughly -1 to 1? 
+      // We'll normalize uMouse in React to -scale/2 to scale/2 or similar, 
+      // but let's assume uMouse is passed as UV coordinates (0 to 1) or Normalized Device Coords (-1 to 1).
+      // Let's assume uMouse is in UV space (0 to 1) for simplicity in shader.
       
-      // Spread them in a large volume
-      array[i * 3] = THREE.MathUtils.randFloatSpread(15);     // x
-      array[i * 3 + 1] = THREE.MathUtils.randFloatSpread(10); // y
-      array[i * 3 + 2] = THREE.MathUtils.randFloatSpread(10); // z
+      float dist = distance(uv, uMouse);
+      
+      // Interaction Wave
+      // Create a localized wave based on mouse proximity
+      float interaction = smoothstep(0.5, 0.0, dist); 
+      
+      // General Fluid Motion
+      float noiseVal = snoise(vec3(pos.x * 1.5, pos.y * 1.5, uTime * 0.2));
+      
+      // Combine:
+      // The mouse interaction adds extra turbulence/height
+      float elevation = noiseVal * 0.5 + (interaction * sin(uTime * 5.0 - dist * 20.0) * 0.3);
+      
+      pos.z += elevation;
+      
+      vElevation = elevation;
+      
+      // Compute normal for lighting approximation (simple finite difference or analytically usually, 
+      // but provided normal is flat plane, so we rely on varying or standard attributes if we deform significantly)
+      // Here we just pass the standard model normal but let's recompute or fake it in fragment for performance.
+      vNormal = normal; // Simplified
+
+      vec4 modelViewPosition = modelViewMatrix * vec4(pos, 1.0);
+      vViewPosition = -modelViewPosition.xyz;
+      gl_Position = projectionMatrix * modelViewPosition;
     }
-    return array;
-  }, []);
+  `,
+  // Fragment Shader
+  `
+    varying vec2 vUv;
+    varying float vElevation;
+    uniform vec2 uMouse;
+    uniform float uTime;
 
-  useFrame((state, delta) => {
-    if (!ref.current) return;
-    
-    // Smooth idle rotation
-    ref.current.rotation.x -= delta / 15;
-    ref.current.rotation.y -= delta / 20;
+    void main() {
+      // Base color: Ferrofluid Black/Dark Metal
+      vec3 baseColor = vec3(0.02, 0.02, 0.02);
+      
+      // Highlights based on elevation (fake reflections)
+      float highlight = smoothstep(0.2, 0.8, vElevation);
+      vec3 reflection = vec3(0.1) * highlight;
+      
+      // Emissive Neon Green Logic
+      // Glow where elevation is high or close to mouse?
+      // Let's make the "rips" or high points glow green
+      
+      float distToMouse = distance(vUv, uMouse);
+      float glowIntensity = smoothstep(0.3, 0.0, distToMouse);
+      
+      // Dynamic pulsing glow
+      vec3 glowColor = vec3(0.8, 1.0, 0.0); // Neon Green-ish #CCFF00
+      
+      // Mix them
+      vec3 finalColor = baseColor + reflection;
+      
+      // Add glow only near mouse and slightly on ridges
+      finalColor += glowColor * glowIntensity * 0.4 * (vElevation + 0.5);
+      
+      gl_FragColor = vec4(finalColor, 1.0);
+    }
+  `
+);
 
-    // Interactive wave effect with mouse
-    // Simply easing the group rotation towards mouse position for a "looking at" feel
-    const x = state.pointer.x * 0.2;
-    const y = state.pointer.y * 0.2;
-    
-    // We can also access the attribute to animate points individually if needed, 
-    // but for performance and style, rotating the entire cloud slightly is elegant.
-    ref.current.rotation.x += (y - ref.current.rotation.x) * delta * 2;
-    ref.current.rotation.y += (x - ref.current.rotation.y) * delta * 2;
+extend({ LiquidMaterial });
+
+const LiquidPlane = () => {
+  const ref = useRef();
+  const { viewport } = useThree();
+  
+  // Calculate Plane size to cover viewport
+  // At z=0 with perspective camera, we need to adapt size.
+  // Or just make it huge.
+  
+  useFrame((state) => {
+    if (ref.current) {
+        ref.current.uTime = state.clock.elapsedTime;
+        
+        // Convert mouse (-1 to 1) to UV space (0 to 1) roughly for the shader
+        // state.pointer.x is -1 to 1
+        const u = (state.pointer.x + 1) / 2;
+        const v = (state.pointer.y + 1) / 2;
+        
+        // Lerp for smoothness
+        ref.current.uMouse.x += (u - ref.current.uMouse.x) * 0.1;
+        ref.current.uMouse.y += (v - ref.current.uMouse.y) * 0.1;
+    }
   });
 
   return (
-    <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
-        <PointMaterial
-          transparent
-          color="#CCFF00"
-          size={0.03}
-          sizeAttenuation={true}
-          depthWrite={false}
-          opacity={0.6}
-        />
-      </Points>
-    </group>
+    <mesh position={[0, 0, 0]}>
+      <planeGeometry args={[viewport.width * 1.5, viewport.height * 1.5, 128, 128]} />
+      <liquidMaterial ref={ref} transparent />
+    </mesh>
   );
 };
 
-// --- HELPERS ---
+// --- HELPER COMPONENTS ---
 const MagneticButton = ({ children }) => {
   const ref = useRef(null);
   const x = useSpring(0, { stiffness: 150, damping: 15 });
@@ -94,97 +246,60 @@ const MagneticButton = ({ children }) => {
   );
 };
 
-// --- MAIN COMPONENT ---
+// --- MAIN SHOWREEL COMPONENT ---
 const Showreel = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  const videoUrl = "https://owzleztogrxabkmqqqop.supabase.co/storage/v1/object/public/Assets/hero.mp4";
 
   return (
-    <section className="relative w-full h-[80vh] bg-black flex items-center justify-center overflow-hidden">
+    <section className="relative w-full h-screen bg-black overflow-hidden flex items-center justify-center">
       
-      {/* 3D POINT CLOUD BACKGROUND */}
+      {/* 3D LIQUID BACKGROUND */}
       <div className="absolute inset-0 z-0">
-         <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
-            <color attach="background" args={["#000000"]} />
-            <ParticleField />
-         </Canvas>
+          <Canvas camera={{ position: [0, 0, 2], fov: 75 }}>
+              <color attach="background" args={['#000000']} />
+              <LiquidPlane />
+          </Canvas>
       </div>
 
-      {/* VIGNETTE GRADIENT */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000000_100%)] pointer-events-none z-0 opacity-80" />
+      {/* OVERLAY CONTENT */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center pointer-events-none">
+          {/* Typography */}
+          <div className="mb-12 select-none mix-blend-difference">
+               <h2 className="text-sm md:text-base font-mono text-[#CCFF00] tracking-[0.5em] uppercase mb-6 opacity-80">
+                 // Liquid Intelligence
+               </h2>
+               <h2 className="text-5xl md:text-8xl lg:text-9xl font-black text-white font-clash uppercase tracking-tighter leading-none">
+                  WATCH THE <br/> REVOLUTION
+               </h2>
+          </div>
 
-      {/* CENTER INTERACTION AREA */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center">
-        
-        {/* STATIC SIGNATURE & TYPOGRAPHY */}
-        <div className="mb-12 pointer-events-none select-none group">
-             <h2 className="text-sm md:text-base font-mono text-gray-500 tracking-[0.5em] uppercase mb-4 opacity-50">
-               // Digital Signature
-             </h2>
-             <motion.h2 
-               className="text-5xl md:text-8xl font-black text-white font-clash uppercase tracking-tighter leading-none transition-all duration-300"
-               style={{ textShadow: "0 0 0px rgba(0,0,0,0)" }}
-             >
-                <span className="group-hover:[text-shadow:2px_0_red,-2px_0_blue] transition-[text-shadow] duration-300">WATCH THE</span> <br/> 
-                <span className="group-hover:[text-shadow:2px_0_red,-2px_0_blue] transition-[text-shadow] duration-300 text-white">REVOLUTION</span>
-             </motion.h2>
-        </div>
-
-        {/* MAGNETIC BUTTON */}
-        <MagneticButton>
-            <div 
-                onClick={() => setModalOpen(true)}
-                className="group/btn relative w-24 h-24 md:w-32 md:h-32 flex items-center justify-center cursor-pointer"
-            >
-                {/* Expanding Ring */}
-                <div className="absolute inset-0 rounded-full border border-[#CCFF00] opacity-30 group-hover/btn:scale-150 group-hover/btn:opacity-0 transition-all duration-700 ease-out" />
-                
-                {/* Main Circle */}
-                <div className="relative w-full h-full bg-[#CCFF00]/10 backdrop-blur-md rounded-full border border-[#CCFF00] flex items-center justify-center transition-all duration-300 group-hover/btn:bg-[#CCFF00]">
-                    {/* Play Icon */}
-                    <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[18px] border-l-[#CCFF00] border-b-[10px] border-b-transparent ml-2 group-hover/btn:border-l-black transition-colors duration-300" />
-                </div>
-            </div>
-        </MagneticButton>
+          {/* Interaction Button */}
+          <div className="pointer-events-auto">
+              <MagneticButton>
+                  <button 
+                      onClick={() => setModalOpen(true)}
+                      className="group relative w-32 h-32 flex items-center justify-center rounded-full bg-transparent"
+                  >
+                      {/* Animated Border/Glow */}
+                      <div className="absolute inset-0 rounded-full border border-white/20 group-hover:border-[#CCFF00] group-hover:bg-[#CCFF00]/10 transition-all duration-300" />
+                      
+                      {/* Play Icon */}
+                      <div className="w-0 h-0 border-t-[12px] border-t-transparent border-l-[20px] border-l-white border-b-[12px] border-b-transparent ml-2 group-hover:border-l-[#CCFF00] transition-colors duration-300 transform group-hover:scale-110" />
+                      
+                      {/* Radial Ripple */}
+                      <div className="absolute inset-0 rounded-full border border-[#CCFF00] opacity-0 group-hover:animate-ping" style={{ animationDuration: '2s' }} />
+                  </button>
+              </MagneticButton>
+          </div>
       </div>
 
-      {/* FULL SCREEN MODAL */}
+      {/* MODAL (Safe Version without hero.mp4) */}
       <AnimatePresence>
-        {modalOpen && (
-            <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 md:p-10"
-            >
-                {/* Close Button */}
-                <button 
-                   onClick={() => setModalOpen(false)}
-                   className="absolute top-8 right-8 z-[210] text-white hover:text-[#CCFF00] text-xs font-mono tracking-widest uppercase flex items-center gap-3 transition-colors"
-                >
-                    [ CLOSE ]
-                    <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center">✕</div>
-                </button>
-
-                {/* Video Player */}
-                <motion.div 
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.95, opacity: 0 }}
-                    className="relative w-full max-w-6xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl border border-white/10"
-                >
-                    <video 
-                        src={videoUrl}
-                        className="w-full h-full object-contain"
-                        controls
-                        autoPlay
-                    />
-                </motion.div>
-            </motion.div>
-        )}
+          {modalOpen && <ShowreelModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />}
       </AnimatePresence>
 
     </section>
   );
 };
+
 export default Showreel;
